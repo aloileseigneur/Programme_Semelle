@@ -279,8 +279,10 @@ class Update(QThread):
 app = QtWidgets.QApplication([])
 MainWindow = QtWidgets.QMainWindow()
 
-Serial().start()
-Update().start()
+widget = Serial()
+widget.start()
+widget1 = Update()
+widget1.start()
 
 
 ui = Boxmainwindow(MainWindow)
