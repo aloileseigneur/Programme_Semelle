@@ -1,4 +1,3 @@
-
 from random import randint
 from pyqtgraph.Qt import QtGui,  QtWidgets
 import pyqtgraph as pg
@@ -6,7 +5,6 @@ import serial
 from MainWindow import *
 from numpy import linspace
 from PyQt5.QtCore import QThread
-
 
 ser = serial.Serial(port = "/dev/ttyUSB0",baudrate=230400,timeout=1) # configuration du port série
 
@@ -162,10 +160,7 @@ class Serial(QThread):
                 value3 = int_millieue
                 value4 = int_doigt              # read line (single value) from the serial port
                 
-
-
-               
-                
+         
                 self.Ti1[-1] = float(value)                 # vector containing the instantaneous values      
                 self.Te1[-1] = float(value1)
                 self.Mi1[-1] = float(value2)                 # vector containing the instantaneous values      
@@ -225,8 +220,6 @@ class Serial(QThread):
                 valueg3 = int_millieueg
                 valueg4 = int_doigtg 
 
-                
-
                 self.Ti[-1] = float(valueg)                 # vector containing the instantaneous values      
                 self.Te[-1] = float(valueg1)
                 self.Mi[-1] = float(valueg2)                 # vector containing the instantaneous values      
@@ -248,12 +241,9 @@ class Serial(QThread):
 
 
 
-
 app = QtWidgets.QApplication([])
 MainWindow = QtWidgets.QMainWindow()
 
 ui = Window(MainWindow)
 MainWindow.show()
 app.exec()
-
-
