@@ -1,14 +1,12 @@
 
-from concurrent.futures import thread
-from math import radians
 from random import randint
-from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
+from pyqtgraph.Qt import QtGui,  QtWidgets
 import pyqtgraph as pg
 import serial
-import sys
 from MainWindow import *
-from numpy import linspace, random
-from PyQt5.QtCore import pyqtSignal,QThread
+from numpy import linspace
+from PyQt5.QtCore import QThread
+
 
 ser = serial.Serial(port = "/dev/ttyUSB0",baudrate=230400,timeout=1) # configuration du port série
 
