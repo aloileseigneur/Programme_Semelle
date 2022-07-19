@@ -12,31 +12,30 @@ from PyQt5.QtCore import pyqtSignal,QThread
 
 ser = serial.Serial(port = "/dev/ttyUSB0",baudrate=230400,timeout=1) # configuration du port série
 
-class Boxmainwindow(Ui_MainWindow):
+class Window(Ui_MainWindow):
     pg.setConfigOption('background','w')
     pg.setConfigOption('foreground', 'k')
 
-    windowWidth = 500                    # width of the window displaying the curve
-    Ti = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Te = linspace(0,0,windowWidth)
-    Mi = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Me = linspace(0,0,windowWidth)
-    Dt = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Ti1 = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Te1 = linspace(0,0,windowWidth)
-    Mi1 = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Me1 = linspace(0,0,windowWidth)
-    Dt1 = linspace(0,0,windowWidth)
-    ptr = 0  
-    ptr1 = 0  
+     
 
     def __init__(self,window):
+        super().__init__()
         self.setupUi(window)
-        self.window()
-        # self.pushButton.clicked.connect(self.window)
-    
-    def window(self):
-        #self.window1 = pg.GraphicsWindow(title="SEMELLES", size = (1920,1080)) # creates a window
+        
+        self.windowWidth = 500                    # width of the window displaying the curve
+        self.Ti = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Te = linspace(0,0,self.windowWidth)
+        self.Mi = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Me = linspace(0,0,self.windowWidth)
+        self.Dt = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Ti1 = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Te1 = linspace(0,0,self.windowWidth)
+        self.Mi1 = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Me1 = linspace(0,0,self.windowWidth)
+        self.Dt1 = linspace(0,0,self.windowWidth)
+        
+        self.ptr = 0  
+        self.ptr1 = 0
         
         self.p = self.graphicsView.addPlot(title="Semelles Gauche")
         self.p.setYRange(0,1000)
@@ -78,28 +77,38 @@ class Boxmainwindow(Ui_MainWindow):
         self.curveMeD = self.p1.plot(pen = pen_black1)
         self.curveDtD = self.p1.plot(pen = pen_green1)
 
+
         self.serial = Serial(self)
-        self.update = Update(self)
+        self.serial.start()
+        # self.update = Update(self)
+        #self.update.start()
+
+    def __del__(self):
+        #self.update.terminate()
+        self.serial.terminate()
+        # self.update.wait()
+        self.serial.wait()
     
         
 class Serial(QThread):
-    windowWidth = 500                    # width of the window displaying the curve
-    Ti = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Te = linspace(0,0,windowWidth)
-    Mi = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Me = linspace(0,0,windowWidth)
-    Dt = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Ti1 = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Te1 = linspace(0,0,windowWidth)
-    Mi1 = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Me1 = linspace(0,0,windowWidth)
-    Dt1 = linspace(0,0,windowWidth)
-    
-    ptr = 0  
-    ptr1 = 0 
-    def __init__(self,parent=None):
-        super(Serial,self).__init__(parent)
+    def __init__(self,parent):
+        super(Serial,self).__init__()
         self._parent = parent
+
+        self.windowWidth = 500                    # width of the window displaying the curve
+        self.Ti = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Te = linspace(0,0,self.windowWidth)
+        self.Mi = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Me = linspace(0,0,self.windowWidth)
+        self.Dt = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Ti1 = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Te1 = linspace(0,0,self.windowWidth)
+        self.Mi1 = linspace(0,0,self.windowWidth)          # create array that will contain the relevant time series     
+        self.Me1 = linspace(0,0,self.windowWidth)
+        self.Dt1 = linspace(0,0,self.windowWidth)
+        
+        self.ptr = 0  
+        self.ptr1 = 0 
 
     def setgui(self, gui):
         self.gui = gui
@@ -122,7 +131,17 @@ class Serial(QThread):
             # value3 = int_millieue
             # value4 = int_doigt
             # ###############################################
-
+            self.Ti[:-1] = self.Ti[1:]  
+            self.Te[:-1] = self.Te[1:]
+            self.Mi[:-1] = self.Mi[1:]
+            self.Me[:-1] = self.Me[1:]
+            self.Dt[:-1] = self.Dt[1:]
+            self.Ti1[:-1] = self.Ti1[1:]  
+            self.Te1[:-1] = self.Te1[1:]
+            self.Mi1[:-1] = self.Mi1[1:]
+            self.Me1[:-1] = self.Me1[1:]
+            self.Dt1[:-1] = self.Dt1[1:]  
+            
             receive = ser.read(22)  #reception de 22 bytes 
             receivehex = receive.hex() # conversion en héxadecimal
             liste = str(receivehex)
@@ -229,71 +248,14 @@ class Serial(QThread):
             self._parent.curveMe.setPos(self.ptr,0)
             self._parent.curveDt.setPos(self.ptr,0)
 
-class Update(QThread):
 
-    
-    windowWidth = 500                    # width of the window displaying the curve
-    Ti = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Te = linspace(0,0,windowWidth)
-    Mi = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Me = linspace(0,0,windowWidth)
-    Dt = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Ti1 = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Te1 = linspace(0,0,windowWidth)
-    Mi1 = linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
-    Me1 = linspace(0,0,windowWidth)
-    Dt1 = linspace(0,0,windowWidth)
-    ptr = 0  
-    ptr1 = 0  
-
-    def __init__(self,parent=None):
-        super(Update,self).__init__(parent)
-        self._parent = parent
-
-    def setgui(self, gui):
-        self.gui = gui
-
-    def run1(self):
-        
-        while True:
-            self.Ti[:-1] = self.Ti[1:]  
-            self.Te[:-1] = self.Te[1:]
-            self.Mi[:-1] = self.Mi[1:]
-            self.Me[:-1] = self.Me[1:]
-            self.Dt[:-1] = self.Dt[1:]
-            self.Ti1[:-1] = self.Ti1[1:]  
-            self.Te1[:-1] = self.Te1[1:]
-            self.Mi1[:-1] = self.Mi1[1:]
-            self.Me1[:-1] = self.Me1[1:]
-            self.Dt1[:-1] = self.Dt1[1:]  
-            
-            
-
-
-            
-
-
-                
 
 
 app = QtWidgets.QApplication([])
 MainWindow = QtWidgets.QMainWindow()
 
-widget = Serial()
-widget.start()
-widget1 = Update()
-widget1.start()
-
-
-ui = Boxmainwindow(MainWindow)
+ui = Window(MainWindow)
 MainWindow.show()
 app.exec()
-Serial().terminate()
-Update().terminate()
-Serial().wait()
-Update().wait()
 
-##
-# join thread
-# les stop aussi
-# ##
+
